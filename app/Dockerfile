@@ -38,14 +38,20 @@ RUN addgroup -S app && adduser -S app -G app
 # create the appropriate directories
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
-RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
+
+# Create a folder for compiling static files
+RUN mkdir -p /var/www/static
+RUN chown app:app /var/www/static
 
 # install dependencies
 RUN apk update && apk add libpq
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
+
+# copy entrypoint.sh
+COPY ./entrypoint.sh .
 
 # copy project
 COPY . $APP_HOME

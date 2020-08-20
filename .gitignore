@@ -97,3 +97,5 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# Ignore mounted DB folder
+app/db
