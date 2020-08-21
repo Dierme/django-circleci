@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - static_volume:/var/www/static
+      - ./app/djangoci:/home/app/web/djangoci
     expose:
       - 8000
     env_file:
