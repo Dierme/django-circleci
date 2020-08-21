@@ -1,0 +1,55 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8.3-buster
+        environment:
+          DEBUG: 1
+          SECRET_KEY: "foo"
+          DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
+          SQL_ENGINE: "django.db.backends.postgresql"
+          SQL_DATABASE: "dierme_db"
+          SQL_USER: "dierme"
+          SQL_PASSWORD: "secret"
+          SQL_HOST: "djangoci_test-db"
+          SQL_PORT: 5432
+          DATABASE: "postgres"
+          PYTHONDONTWRITEBYTECODE: 1
+          PYTHONUNBUFFERED: 1
+
+      - image: postgres:12.0-alpine
+        name: djangoci_test-db
+        environment:
+          POSTGRES_USER: "dierme"
+          POSTGRES_PASSWORD: "secret"
+          POSTGRES_DB: "dierme_db"
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.8/site-packages
+      - restore_cache:  # ensure this step occurs *before* installing dependencies
+            key: deps9-{{ .Branch }}-{{ checksum "setup.py" }}
+      - run:
+          name: Installing DB dependancies
+          command: |
+            sudo apt update && sudo apt -y install gnupg2 && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+            echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | sudo tee  /etc/apt/sources.list.d/pgdg.list
+            sudo apt update && sudo apt -y install postgresql-12 postgresql-client-12
+            sudo apt install gcc musl-dev
+      - run:
+          name: Installing python dep
+          command: |
+            sudo pip install --upgrade pip
+            cd app
+            sudo pip install --no-cache-dir -r requirements.txt
+      - save_cache:
+          key: deps9-{{ .Branch }}-{{ checksum "setup.py" }}
+          paths:
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.8/site-packages"
+      - run:
+          name: Create a folder with correct permission for the static files
+          command: sudo mkdir -p /var/www/static && sudo chown -R circleci:circleci /var/www/static
+      - run:
+          name: Running tests
+          command: cd app && sh test_entrypoint.sh

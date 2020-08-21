@@ -19,7 +19,6 @@ wait_for_postgres() (
 SCRIPT=$(readlink "$0")
 BASE_PATH=$(dirname "$SCRIPT")
 SOURCE_DIR=$(cd $BASE_PATH; pwd)
-#export UID GID
 
 docker run --name "djangoci_test-db" --env-file .env.db.dev -d -p 5445:5432 --rm postgres:12.0-alpine
 
