@@ -1,6 +1,7 @@
 version: '3.7'
 
 services:
+  # Application container
   web:
     build:
       context: ./app
@@ -14,19 +15,25 @@ services:
       - ./app/.env
     depends_on:
       - db
+
+  # Database container
   db:
     image: postgres:12.0-alpine
     volumes:
       - ./app/db/:/var/lib/postgresql/data
     env_file:
       - ./app/.env.db
+
+  # Nginx container
   nginx:
-    build: ./nginx
+    image: nginx:1.19.0-alpine
     volumes:
       - static_volume:/var/www/static
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - 1337:80
     depends_on:
       - web
+
 volumes:
   static_volume:
