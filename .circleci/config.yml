@@ -1,6 +1,7 @@
-version: 2
+version: 2.1
+
 jobs:
-  build:
+  django-tests:
     docker:
       - image: circleci/python:3.8.3-buster
         environment:
@@ -54,3 +55,8 @@ jobs:
       - run:
           name: Running tests
           command: cd app && sh test_entrypoint.sh
+
+workflows:
+  test-push:
+    jobs:
+    - django-tests
