@@ -18,4 +18,4 @@ class HelloWorldTestCase(TestCase):
         response = client.get("/")
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(response.content.decode(), "Hello, world. You're at the index.")
+        self.assertEqual(response.content.decode(), "Hello, world. You're at the index. Bingo")
