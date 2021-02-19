@@ -9,10 +9,6 @@ class HelloWorldTestCase(TestCase):
         """Successful test case"""
         self.assertTrue(True)
 
-    def test_failing_case(self):
-        """Failing test case"""
-        self.assertTrue(False)
-
     def test_http_request(self):
         client = Client()
         response = client.get("/")
